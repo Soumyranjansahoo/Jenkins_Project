@@ -5,3 +5,9 @@ sudo yum upgrade
 sudo yum install fontconfig java-21-openjdk -y
 sudo yum install jenkins -y
 sudo systemctl daemon-reload
+
+sudo systemctl enable jenkins
+chkconfig jenkins on
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+
