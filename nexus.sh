@@ -5,14 +5,15 @@
 cd /opt
 
 # Download Nexus (latest stable 3.88)
-wget https://download.sonatype.com/nexus/3/nexus-3.88.0-08-unix.tar.gz -O nexus.tgz
+wget https://download.sonatype.com/nexus/3/nexus-3.89.1-02-linux-x86_64.tar.gz
 
 # Extract
 tar -xvf nexus.tgz
-mv nexus-3.88.0-08 nexus
+mv nexus-3.89.0-08 nexus
 
 # Create data folder
-mkdir -p /opt/sonatype-work
+
+
 useradd nexus || true
 chown -R nexus:nexus /opt/nexus /opt/sonatype-work
 
@@ -37,6 +38,20 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 EOF
+
+
+sudo mkdir -p /opt/sonatype-work/nexus3/log
+sudo mkdir -p /opt/sonatype-work/nexus3/tmp
+sudo chown -R nexus:nexus /opt/sonatype-work
+# Backup first
+sudo cp /opt/nexus/bin/nexus.vmoptions /opt/nexus/bin/nexus.vmoptions.bak.$(date +%F-%H%M%S)
+
+# Set smaller, safer values (adjust if you know your box size)
+sudo sed -i \
+  -e 's/^-Xms.*$/-Xms1024m/' \
+  -e 's/^-Xmx.*$/-Xmx1024m/' \
+  -e 's/^-XX:MaxDirectMemorySize=.*$/-XX:MaxDirectMemorySize=512m/' \
+  /opt/nexus/bin/nexus.vmoptions
 
 # Start service
 systemctl daemon-reload
